@@ -123,3 +123,34 @@ const ellipsis = R.pipe(R.slice(0, 200), R.append('...'), R.join(''));
 // This is how I go around it, it's a hack
 ellipsis((subText as unknown) as readonly unknown[])
 ``` 
+
+
+
+## RXJS operators
+
+The map operator cannot deduct the type.
+``` 
+  return appServices.auth.state$.pipe(
+            map((state: AuthStoreState) => {
+              return {
+                type: 'AUTH_UPDATE',
+                record: state.context.userProfile,
+              };
+            }),
+          ),
+```
+
+Change it to, check the lines `Observable<AuthStoreState>` or even better if you know the exact type use that and avoid the `unknown` part:
+```
+return (appServices.auth.state$ as unknown as Observable<AuthStoreState>).pipe(
+            map((state:AuthStoreState) => {
+              return {
+                type: 'AUTH_UPDATE',
+                record: state.context.userProfile,
+              };
+            }),
+          );
+
+```
+
+
